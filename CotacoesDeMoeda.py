@@ -20,13 +20,22 @@ def get_currency_counts():
     format = "json-cors"
     url = f"https://api.hgbrasil.com/finance/quotations?format={format}&key={key}"
     request = requests.get(url)
-    if request.status_code == requests.codes.ok:
-        data = request.json()
-        return data
+    if not(request.status_code == requests.codes.ok):
+        print(f"[ERRO] Falha na requisição - Status: {request.status_code}")
+        return None
+
+    try:
+        data_json = request.json()
+        print("Requisição bem-sucedida. Dados recebidos da API HG Brasil.")
+        return data_json
+    except ValueError:
+        print("[ERRO] Falha ao converter a resposta em JSON.")
+        return None
 
 
 
-def write_database(data):
+
+def write_database(currency_data):
     conecction = sqlite3.connect('bdcotacoes.db')
     cursor = conecction.cursor()
 
@@ -35,16 +44,17 @@ def write_database(data):
     if not table_exists:
         create_tables()
 
-    dateobject = datetime.datetime.now()
+    date  = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    dolar = currency_data['results']['currencies']['USD']['buy']
+    euro = currency_data['results']['currencies']['EUR']['buy']
 
-    date  = '{}/{}/{} {}:{}:{}'.format(dateobject.day, dateobject.month,dateobject.year,dateobject.hour,dateobject.minute,dateobject.second)
-    dolar = data['results']['currencies']['USD']['buy']
-    euro = data['results']['currencies']['EUR']['buy']
     cursor.execute("INSERT INTO coins (Date, Dolar, Euro) VALUES (?, ?, ?)", (date, dolar, euro))
     conecction.commit()
+    print(f"Registro salvo com sucesso: {date} | Dólar: R$ {dolar:.2f} | Euro: R$ {euro:.2f}")
 
+data = get_currency_counts()
+if data is None:
+    print("[ERRO] Não foi possível obter dados válidos da API.")
+    exit()
 
-write_database(get_currency_counts())
-
-
-
+write_database(data)
