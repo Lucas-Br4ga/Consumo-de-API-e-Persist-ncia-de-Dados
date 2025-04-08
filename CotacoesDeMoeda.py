@@ -1,7 +1,7 @@
 import sqlite3
 import datetime
 import requests
-def CreateTables():
+def createtables():
     conecction = sqlite3.connect('bdcotacoes.db')
     cursor = conecction.cursor()
     cursor.execute("select name from sqlite_master where type='table' and name='coins'")
@@ -11,35 +11,40 @@ def CreateTables():
         return
     else:
         sql ='create table coins(' \
-            'requestID interger primary key autoincrement,'\
+            'requestID integer primary key autoincrement,'\
             'Date varchar(20) not null,'\
             'Dolar real,'\
             'Euro real)'
 
         cursor.execute(sql)
         print("Table 'Coins' table created successfully.")
-def GetCurrencyCounts():
-    conecction = sqlite3.connect('bdcotacoes.db')
-    cursor = conecction.cursor()
+
+
+def getcurrencycounts():
     key = "c8c29944"
-    format = "json"
+    format = "json-cors"
     url = f"https://api.hgbrasil.com/finance/quotations?format={format}&key={key}"
     request = requests.get(url)
     if request.status_code == requests.codes.ok:
         data = request.json()
-        dateObject = datetime.datetime.now()
-
-        date  = '{}/{}/{} {}:{}:{}'.format(dateObject.day, dateObject.month,dateObject.year,dateObject.hour,dateObject.minute,dateObject.second)
-        dolar = data['results']['currencies']['USD']['buy']
-        euro = data['results']['currencies']['EUR']['buy']
-        cursor.execute("INSERT INTO coins (Date, Dolar, Euro) VALUES (?, ?, ?)", (date, dolar, euro))
-        conecction.commit()
+        return data
 
 
 
+def writedatabase(data):
+    conecction = sqlite3.connect('bdcotacoes.db')
+    cursor = conecction.cursor()
+    dateobject = datetime.datetime.now()
 
-CreateTables()
-GetCurrencyCounts()
+    date  = '{}/{}/{} {}:{}:{}'.format(dateobject.day, dateobject.month,dateobject.year,dateobject.hour,dateobject.minute,dateobject.second)
+    dolar = data['results']['currencies']['USD']['buy']
+    euro = data['results']['currencies']['EUR']['buy']
+    cursor.execute("INSERT INTO coins (Date, Dolar, Euro) VALUES (?, ?, ?)", (date, dolar, euro))
+    conecction.commit()
+
+
+createtables()
+writedatabase(getcurrencycounts())
 
 
 
