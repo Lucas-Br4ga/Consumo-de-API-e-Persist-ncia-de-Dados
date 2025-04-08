@@ -13,6 +13,7 @@ def create_tables():
 
     cursor.execute(sql)
     print("Table 'Coins' table created successfully.")
+    conecction.close()
 
 
 def get_currency_counts():
@@ -51,6 +52,8 @@ def write_database(currency_data):
     cursor.execute("INSERT INTO coins (Date, Dolar, Euro) VALUES (?, ?, ?)", (date, dolar, euro))
     conecction.commit()
     print(f"Registro salvo com sucesso: {date} | Dólar: R$ {dolar:.2f} | Euro: R$ {euro:.2f}")
+    conecction.close()
+
 
 data = get_currency_counts()
 if data is None:
