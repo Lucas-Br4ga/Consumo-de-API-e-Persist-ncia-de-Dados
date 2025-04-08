@@ -2,7 +2,6 @@
 
 ![Python](https://img.shields.io/badge/Python-3.6+-blue.svg?logo=python&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-3-blue.svg?logo=sqlite&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Version](https://img.shields.io/badge/Version-1.0.0-informational)
 ![API](https://img.shields.io/badge/API-HG%20Brasil-orange)
 
