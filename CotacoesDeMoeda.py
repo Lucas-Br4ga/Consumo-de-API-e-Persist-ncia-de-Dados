@@ -1,26 +1,21 @@
 import sqlite3
 import datetime
 import requests
-def createtables():
+def create_tables():
     conecction = sqlite3.connect('bdcotacoes.db')
     cursor = conecction.cursor()
-    cursor.execute("select name from sqlite_master where type='table' and name='coins'")
-    table_exists = cursor.fetchall()
-    if table_exists:
-        print("Table 'Coins' already exists.")
-        return
-    else:
-        sql ='create table coins(' \
-            'requestID integer primary key autoincrement,'\
-            'Date varchar(20) not null,'\
-            'Dolar real,'\
-            'Euro real)'
 
-        cursor.execute(sql)
-        print("Table 'Coins' table created successfully.")
+    sql ='create table coins(' \
+        'requestID integer primary key autoincrement,'\
+        'Date varchar(20) not null,'\
+        'Dolar real,'\
+        'Euro real)'
+
+    cursor.execute(sql)
+    print("Table 'Coins' table created successfully.")
 
 
-def getcurrencycounts():
+def get_currency_counts():
     key = "c8c29944"
     format = "json-cors"
     url = f"https://api.hgbrasil.com/finance/quotations?format={format}&key={key}"
@@ -31,9 +26,15 @@ def getcurrencycounts():
 
 
 
-def writedatabase(data):
+def write_database(data):
     conecction = sqlite3.connect('bdcotacoes.db')
     cursor = conecction.cursor()
+
+    cursor.execute("select name from sqlite_master where type='table' and name='coins'")
+    table_exists = cursor.fetchall()
+    if not table_exists:
+        create_tables()
+
     dateobject = datetime.datetime.now()
 
     date  = '{}/{}/{} {}:{}:{}'.format(dateobject.day, dateobject.month,dateobject.year,dateobject.hour,dateobject.minute,dateobject.second)
@@ -43,8 +44,7 @@ def writedatabase(data):
     conecction.commit()
 
 
-createtables()
-writedatabase(getcurrencycounts())
+write_database(get_currency_counts())
 
 
 
