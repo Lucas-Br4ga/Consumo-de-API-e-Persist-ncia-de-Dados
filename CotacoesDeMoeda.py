@@ -11,6 +11,7 @@ def CreateTables():
         return
     else:
         sql ='create table coins(' \
+            'requestID interger primary key autoincrement,'\
             'Date varchar(20) not null,'\
             'Dolar real,'\
             'Euro real)'
@@ -24,7 +25,7 @@ def GetCurrencyCounts():
     format = "json"
     url = f"https://api.hgbrasil.com/finance/quotations?format={format}&key={key}"
     request = requests.get(url)
-    if request.status_code == 200:
+    if request.status_code == requests.codes.ok:
         data = request.json()
         dateObject = datetime.datetime.now()
 
